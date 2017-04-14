@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication1", "WindowsFormsApplication1.csproj", "{469BA63D-8F43-4618-93C9-16E2684B773A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaserGnome", "LaserGnome.csproj", "{469BA63D-8F43-4618-93C9-16E2684B773A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
