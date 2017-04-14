@@ -22,7 +22,7 @@ public class ButtonPressEventArgs : EventArgs
 
     public byte Y
     {
-        get { return Y; }
+        get { return y; }
     }
 
     public bool State

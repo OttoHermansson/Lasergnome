@@ -18,8 +18,7 @@ class Arduinome
 
     protected virtual void OnButtonPress(ButtonPressEventArgs e)
     {
-        if (ButtonPress != null)
-            ButtonPress(this, e);
+        ButtonPress?.Invoke(this, e);
     }
 
     public enum messageTypes
@@ -101,6 +100,8 @@ class Arduinome
     private void processSerialDataMethod(byte x, byte y, bool state)
     {
         buttons[x, y] = state;
+        ButtonPressEventArgs btnPressEvent = new ButtonPressEventArgs(x, y, state);
+        OnButtonPress(btnPressEvent);
     }
 
     void serialDataReceived(object sender, SerialDataReceivedEventArgs e)
