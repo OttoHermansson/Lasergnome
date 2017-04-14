@@ -82,6 +82,7 @@ class Arduinome
         port.Parity = Parity.None;
         port.StopBits = StopBits.One;
         port.Handshake = Handshake.None;
+        port.ReceivedBytesThreshold = 2;
 
         port.DataReceived += serialDataReceived;
         del = new processSerialDataDelegate(processSerialDataMethod);
@@ -95,8 +96,10 @@ class Arduinome
 
     void serialDataReceived(object sender, SerialDataReceivedEventArgs e)
     {
-        byte[] input = new byte[port.BytesToRead];
-        port.Read(input, 0, input.Length);
+        SerialPort sp = (SerialPort)sender;
+
+        byte[] input = new byte[sp.BytesToRead];
+        sp.Read(input, 0, input.Length);
 
         if (input.Length % 2 == 0) // Even number only.
         {
