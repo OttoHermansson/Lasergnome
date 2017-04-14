@@ -14,44 +14,52 @@ namespace WindowsFormsApplication1
 {
     public partial class Form1 : Form
     {
-        public delegate void processSerialDataDelegate(byte[] data);
+        public delegate void processSerialDataDelegate(byte x, byte y, bool state);
         public processSerialDataDelegate serialDelegate;
 
 
         private byte[] arduinomoneData = new byte[2];
         SerialPort port = new SerialPort();
+        Timer updateStateTimer = new Timer();
 
-        BitMatrix buttons = new BitMatrix(8, 8);
-
+        BitMatrix buttons;
+        processSerialDataDelegate del;
         public Form1()
         {
             InitializeComponent();
             port.DataReceived += port_DataReceived;
+            del = new processSerialDataDelegate(processSerialDataMethod);
+            buttons = new BitMatrix(8, 8);
+            updateStateTimer.Tick += UpdateStateTimer_Tick;
+            updateStateTimer.Interval = 100;
+            updateStateTimer.Enabled = true;
+            updateStateTimer.Start();
         }
 
-        public void processSerialDataMethod(byte[] data)
+        private void UpdateStateTimer_Tick(object sender, EventArgs e)
         {
-            int x = (data[1] >> 4) & 15;
-            int y = data[1] & 15;
-
-            buttons[x, y] = data[0] == 0 ? false : true;
-
             showButtonStatus();
         }
 
-        static byte[] retByte = new byte[2];
+        public void processSerialDataMethod(byte x, byte y, bool state)
+        {
+            buttons[x, y] = state;
+        }
 
         void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            byte byte1 = 0;
-            byte byte2 = 0;
-
             if (port.BytesToRead == 2)
             {
+                byte[] retByte = new byte[2];
+
                 retByte[0] = (byte)port.ReadByte();
                 retByte[1] = (byte)port.ReadByte();
 
-                this.Invoke(this.serialDelegate, new processSerialDataDelegate(processSerialDataMethod));
+                byte x = (byte)((retByte[1] >> 4) & 15);
+                byte y = (byte)(retByte[1] & 15);
+                bool state = retByte[0] == 0 ? false : true;
+
+                del.Invoke(x, y, state);
             }
         }
 
@@ -103,19 +111,19 @@ namespace WindowsFormsApplication1
 
         private void button4_Click(object sender, EventArgs e)
         {
-            setIntensity(255);
+            showButtonStatus();
         }
 
         private void showButtonStatus()
         {
-            for (int i = 0; i < 8; i++)
+            for (int y = 0; y < 8; y++)
             {
                 for (int x = 0; x < 8; x++)
                 {
-                    int id = ((i * 8) + x) + 1;
+                    int id = ((y * 8) + x) + 1;
 
                     CheckBox ctn = this.Controls.Find("checkBox" + id.ToString(), true).First() as CheckBox;
-                    ctn.Checked = buttons[i, x];
+                    ctn.Checked = buttons[x, y];
                 }
             }
         }
