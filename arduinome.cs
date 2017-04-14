@@ -95,22 +95,24 @@ class Arduinome
 
     void serialDataReceived(object sender, SerialDataReceivedEventArgs e)
     {
-        if (port.BytesToRead == 2)
+        byte[] input = new byte[port.BytesToRead];
+        port.Read(input, 0, input.Length);
+
+        if (input.Length % 2 == 0) // Even number only.
         {
-            byte[] retByte = new byte[2];
+            for (int i = 0; i < input.Length; i += 2)
+            {
+                byte[] retByte = new byte[2];
 
-            retByte[0] = (byte)port.ReadByte();
-            retByte[1] = (byte)port.ReadByte();
+                retByte[0] = input[i];
+                retByte[1] = input[i + 1];
 
-            byte x = (byte)((retByte[1] >> 4) & 15);
-            byte y = (byte)(retByte[1] & 15);
-            bool state = retByte[0] == 0 ? false : true;
+                byte x = (byte)((retByte[1] >> 4) & 15);
+                byte y = (byte)(retByte[1] & 15);
+                bool state = retByte[0] == 0 ? false : true;
 
-            del.Invoke(x, y, state);
-        }
-        else
-        {
-            port.DiscardInBuffer();
+                del.Invoke(x, y, state);
+            }
         }
     }
 
