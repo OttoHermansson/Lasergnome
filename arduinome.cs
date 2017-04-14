@@ -8,10 +8,19 @@ using System.Threading.Tasks;
 class Arduinome
 {
     public delegate void processSerialDataDelegate(byte x, byte y, bool state);
+    public delegate void ButtonPressEventHandler(object sender, ButtonPressEventArgs e);
 
     private SerialPort port = new SerialPort();
     private BitMatrix buttons;
     processSerialDataDelegate del;
+
+    public event ButtonPressEventHandler ButtonPress;
+
+    protected virtual void OnButtonPress(ButtonPressEventArgs e)
+    {
+        if (ButtonPress != null)
+            ButtonPress(this, e);
+    }
 
     public enum messageTypes
     {
