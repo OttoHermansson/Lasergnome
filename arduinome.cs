@@ -77,6 +77,12 @@ class Arduinome
     public Arduinome()
     {
         buttons = new BitMatrix(8, 8);
+
+        port.DataBits = 8;
+        port.Parity = Parity.None;
+        port.StopBits = StopBits.One;
+        port.Handshake = Handshake.None;
+
         port.DataReceived += serialDataReceived;
         del = new processSerialDataDelegate(processSerialDataMethod);
     }
@@ -89,19 +95,23 @@ class Arduinome
 
     void serialDataReceived(object sender, SerialDataReceivedEventArgs e)
     {
+        if (port.BytesToRead == 2)
+        {
+            byte[] retByte = new byte[2];
 
-        byte[] retByte = new byte[2];
+            retByte[0] = (byte)port.ReadByte();
+            retByte[1] = (byte)port.ReadByte();
 
-        retByte[0] = (byte)port.ReadByte();
-        retByte[1] = (byte)port.ReadByte();
+            byte x = (byte)((retByte[1] >> 4) & 15);
+            byte y = (byte)(retByte[1] & 15);
+            bool state = retByte[0] == 0 ? false : true;
 
-        byte x = (byte)((retByte[1] >> 4) & 15);
-        byte y = (byte)(retByte[1] & 15);
-        bool state = retByte[0] == 0 ? false : true;
-
-        del.Invoke(x, y, state);
-
-        port.DiscardInBuffer();
+            del.Invoke(x, y, state);
+        }
+        else
+        {
+            port.DiscardInBuffer();
+        }
     }
 
 
@@ -121,7 +131,6 @@ class Arduinome
         if (port.IsOpen)
         {
             byte onoff = (byte)(state == true ? 1 : 0);
-
             byte data0 = (byte)(((byte)messageTypes.messageTypeLedStateChange << 4) | onoff);
             byte data1 = (byte)((x << 4) | y);
 
