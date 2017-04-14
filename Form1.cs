@@ -26,7 +26,7 @@ namespace Lasergnome
         {
             InitializeComponent();
             updateStateTimer.Tick += UpdateStateTimer_Tick;
-            updateStateTimer.Interval = 100;
+            updateStateTimer.Interval = 10;
             updateStateTimer.Enabled = true;
             updateStateTimer.Start();
         }
@@ -64,15 +64,18 @@ namespace Lasergnome
         {
             for (byte i = 0; i < 8; i++)
             {
-                arduinome.setLed(1, i, true);
+                arduinome.setLed(0, 5, true);
             }
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            for (byte i = 0; i < 8; i++)
+            for (byte y = 0; y < 8; y++)
             {
-                arduinome.setLed(1, i, false);
+                for (byte x = 0; x < 8; x++)
+                {
+                    arduinome.setLed(x, y, false);
+                }
             }
         }
 
