@@ -18,7 +18,8 @@ class Arduinome
 
     protected virtual void OnButtonPress(ButtonPressEventArgs e)
     {
-        ButtonPress?.Invoke(this, e);
+        if (ButtonPress != null)
+            ButtonPress.Invoke(this, e);
     }
 
     public enum messageTypes

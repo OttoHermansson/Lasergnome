@@ -33,7 +33,7 @@ namespace Lasergnome
         private void buttonPress(object sender, ButtonPressEventArgs e)
         {
 
-            textBox1.Text = e.X.ToString() + ", " + e.Y.ToString() + " : " + e.State.ToString();
+            // textBox1.Text = e.X.ToString() + ", " + e.Y.ToString() + " : " + e.State.ToString();
 
 
 
