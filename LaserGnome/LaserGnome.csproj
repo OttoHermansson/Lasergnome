@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="arduinome.cs" />
     <Compile Include="bitmatrix.cs" />
+    <Compile Include="ButtonPressEventArgs.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

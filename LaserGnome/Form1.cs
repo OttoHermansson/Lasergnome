@@ -14,21 +14,30 @@ namespace Lasergnome
 {
     public partial class Form1 : Form
     {
-        public delegate void processSerialDataDelegate(byte x, byte y, bool state);
-        public processSerialDataDelegate serialDelegate;
-
-
-        private byte[] arduinomoneData = new byte[2];
-        Arduinome arduinome = new Arduinome();
+        Arduinome arduinome;
         Timer updateStateTimer = new Timer();
 
         public Form1()
         {
             InitializeComponent();
+
+            arduinome = new Arduinome();
+            arduinome.ButtonPress += buttonPress;
+
             updateStateTimer.Tick += UpdateStateTimer_Tick;
             updateStateTimer.Interval = 10;
             updateStateTimer.Enabled = true;
             updateStateTimer.Start();
+        }
+
+        private void buttonPress(object sender, ButtonPressEventArgs e)
+        {
+
+            textBox1.Text = e.X.ToString() + ", " + e.Y.ToString() + " : " + e.State.ToString();
+
+
+
+            // textBox1.Text = e.X.ToString() + ", " + e.Y.ToString() + " : " + e.State.ToString();
         }
 
         private void UpdateStateTimer_Tick(object sender, EventArgs e)
