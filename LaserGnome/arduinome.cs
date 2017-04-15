@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 class Arduinome
@@ -65,6 +66,7 @@ class Arduinome
         port.BaudRate = baudRate;
         port.PortName = portName;
         port.Open();
+        rebootDevice();
     }
 
     public void Close()
@@ -156,10 +158,13 @@ class Arduinome
 
     public void ledTest(bool state)
     {
-        byte data0 = (byte)((byte)messageTypes.messageTypeLedTest << 4);
-        byte data1 = (byte)(state == true ? 1 : 0);
+        if (port.IsOpen)
+        {
+            byte data0 = (byte)((byte)messageTypes.messageTypeLedTest << 4);
+            byte data1 = (byte)(state == true ? 1 : 0);
 
-        port.Write(new byte[] { data0, data1 }, 0, 2);
+            port.Write(new byte[] { data0, data1 }, 0, 2);
+        }
     }
 
     public void enabled(bool state)
@@ -170,6 +175,19 @@ class Arduinome
             byte data1 = (byte)(state == true ? 1 : 0);
 
             port.Write(new byte[] { data0, data1 }, 0, 2);
+        }
+    }
+
+    public void rebootDevice()
+    {
+        if (port.IsOpen)
+        {
+            port.DiscardInBuffer();
+            port.DiscardOutBuffer();
+            port.DtrEnable = false;
+            Thread.Sleep(10);
+            port.DtrEnable = true;
+            Thread.Sleep(500);
         }
     }
 }

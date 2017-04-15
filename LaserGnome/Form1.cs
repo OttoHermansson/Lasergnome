@@ -90,7 +90,14 @@ namespace Lasergnome
 
         private void button4_Click(object sender, EventArgs e)
         {
+            arduinome.rebootDevice();
         }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            arduinome.ledTest(false);
+        }
+
 
         private void showButtonStatus()
         {
@@ -106,7 +113,5 @@ namespace Lasergnome
                 }
             }
         }
-
-
     }
 }
