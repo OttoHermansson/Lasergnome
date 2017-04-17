@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<settings>
+  <patterns>
+    <button id="1">
+      <pattern key="a"/>
+      <effect id="4"/>
+    </button>
+    <button id="2">
+      <pattern key="b"/>
+      <effect id="0"/>
+    </button>
+    <button id="3">
+      <pattern key="c"/>
+      <effect id="6"/>
+    </button>
+    <button id="4">
+      <pattern key="d"/>
+    </button>
+    <button id="5">
+      <pattern key="e"/>
+      <effect id="4"/>
+    </button>
+    <button id="17">
+      <pattern key="h"/>
+      <effect id="4"/>
+    </button>
+    <button id="55">
+      <pattern key="g"/>
+      <effect id="4"/>
+    </button>
+  </patterns>
+</settings>
