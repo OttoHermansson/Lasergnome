@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApplication1;
 
 namespace Lasergnome
 {
@@ -22,22 +23,28 @@ namespace Lasergnome
             InitializeComponent();
 
             arduinome = new Arduinome();
-            arduinome.ButtonPress += buttonPress;
+
+            arduinome.ButtonDown += buttonPressed;
 
             updateStateTimer.Tick += UpdateStateTimer_Tick;
-            updateStateTimer.Interval = 10;
+            updateStateTimer.Interval = 100;
             updateStateTimer.Enabled = true;
             updateStateTimer.Start();
         }
 
-        private void buttonPress(object sender, ButtonPressEventArgs e)
+        private void buttonPressed(object sender, ButtonEventArgs e)
         {
+            AppendTextBox(e.X.ToString() + ", " + e.Y.ToString() + Environment.NewLine);
+        }
 
-            // textBox1.Text = e.X.ToString() + ", " + e.Y.ToString() + " : " + e.State.ToString();
-
-
-
-            // textBox1.Text = e.X.ToString() + ", " + e.Y.ToString() + " : " + e.State.ToString();
+        public void AppendTextBox(string value)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string>(AppendTextBox), new object[] { value });
+                return;
+            }
+            textBox1.Text += value;
         }
 
         private void UpdateStateTimer_Tick(object sender, EventArgs e)
@@ -95,7 +102,7 @@ namespace Lasergnome
 
         private void button5_Click(object sender, EventArgs e)
         {
-            arduinome.ledTest(false);
+            arduinome.ledTest(true);
         }
 
 

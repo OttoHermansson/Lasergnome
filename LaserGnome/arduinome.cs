@@ -9,19 +9,10 @@ using System.Threading.Tasks;
 class Arduinome
 {
     public delegate void processSerialDataDelegate(byte x, byte y, bool state);
-    public delegate void ButtonPressEventHandler(object sender, ButtonPressEventArgs e);
 
     private SerialPort port = new SerialPort();
     private BitMatrix buttons;
     processSerialDataDelegate del;
-
-    public event ButtonPressEventHandler ButtonPress;
-
-    protected virtual void OnButtonPress(ButtonPressEventArgs e)
-    {
-        if (ButtonPress != null)
-            ButtonPress.Invoke(this, e);
-    }
 
     public enum messageTypes
     {
@@ -84,7 +75,6 @@ class Arduinome
         return buttons[x, y];
     }
 
-
     public Arduinome()
     {
         buttons = new BitMatrix(8, 8);
@@ -99,12 +89,11 @@ class Arduinome
         del = new processSerialDataDelegate(processSerialDataMethod);
     }
 
-
     private void processSerialDataMethod(byte x, byte y, bool state)
     {
         buttons[x, y] = state;
-        ButtonPressEventArgs btnPressEvent = new ButtonPressEventArgs(x, y, state);
-        OnButtonPress(btnPressEvent);
+        if (state) OnButtonDown(x, y);
+        if (!state) OnButtonUp(x, y);
     }
 
     void serialDataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -132,6 +121,23 @@ class Arduinome
         }
     }
 
+    private void OnButtonDown(int rowIndex, int columnIndex)
+    {
+        ButtonEventArgs ev = new ButtonEventArgs(columnIndex, rowIndex);
+        if (ButtonDown != null) ButtonDown(this, ev);
+    }
+
+    public delegate void ButtonDownEventHandler(object sender, ButtonEventArgs e);
+    public event ButtonDownEventHandler ButtonDown;
+
+    private void OnButtonUp(int rowIndex, int columnIndex)
+    {
+        ButtonEventArgs ev = new ButtonEventArgs(columnIndex, rowIndex);
+        if (ButtonUp != null) ButtonUp(this, ev);
+    }
+
+    public delegate void ButtonUpEventHandler(object sender, ButtonEventArgs e);
+    public event ButtonUpEventHandler ButtonUp;
 
     public void setIntensity(byte intensity)
     {
@@ -192,3 +198,26 @@ class Arduinome
     }
 }
 
+public class ButtonEventArgs : EventArgs
+{
+    private readonly int x = 0;
+    private readonly int y = 0;
+
+    // Constructor. 
+    public ButtonEventArgs(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    // Properties. 
+    public int X
+    {
+        get { return x; }
+    }
+
+    public int Y
+    {
+        get { return y; }
+    }
+}
