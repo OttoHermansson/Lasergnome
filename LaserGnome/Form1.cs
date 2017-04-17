@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.IO.Ports;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,7 +25,7 @@ namespace Lasergnome
 
             arduinome = new Arduinome();
 
-            arduinome.ButtonDown += buttonPressed;
+            arduinome.ButtonDown += ButtonDown;
 
             updateStateTimer.Tick += UpdateStateTimer_Tick;
             updateStateTimer.Interval = 100;
@@ -32,20 +33,39 @@ namespace Lasergnome
             updateStateTimer.Start();
         }
 
-        private void buttonPressed(object sender, ButtonEventArgs e)
+        private void ButtonDown(object sender, ButtonEventArgs e)
         {
-            AppendTextBox(e.X.ToString() + ", " + e.Y.ToString() + Environment.NewLine);
+            HandleButtonDown(e.X, e.Y);
         }
 
-        public void AppendTextBox(string value)
+        public void HandleButtonDown(int x, int y)
         {
             if (InvokeRequired)
             {
-                this.Invoke(new Action<string>(AppendTextBox), new object[] { value });
+                this.Invoke(new Action<int, int>(HandleButtonDown), new object[] { x, y });
                 return;
             }
-            textBox1.Text += value;
+
+            // Effect button.
+            if (y == 7) {
+                SendEffectKey(x);
+            }
         }
+
+        private void SendEffectKey(int number)
+        {
+            if (number > -1 && number < 8)
+            {
+                SendKeys.Send(number.ToString());
+                SendKeys.SendWait(number.ToString());
+            }
+        }
+
+        [DllImport("User32.Dll")]
+        public static extern int FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("User32.Dll")]
+        public static extern int GetClassName(int hwnd, StringBuilder lpClassName, int nMaxCount);
 
         private void UpdateStateTimer_Tick(object sender, EventArgs e)
         {
@@ -78,10 +98,11 @@ namespace Lasergnome
 
         private void button2_Click(object sender, EventArgs e)
         {
-            for (byte i = 0; i < 8; i++)
-            {
-                arduinome.setLed(0, 5, true);
-            }
+            StringBuilder r = new System.Text.StringBuilder();
+
+            int i = FindWindow(null, "LaserOS v0.9.0 BETA - Visualizer");
+            int x = GetClassName(i, r, r.Capacity);
+            MessageBox.Show(r.ToString());/// show our found classname.
         }
 
         private void button3_Click(object sender, EventArgs e)

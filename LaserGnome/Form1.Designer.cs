@@ -100,6 +100,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button5 = new System.Windows.Forms.Button();
+            this.checkBox65 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -123,11 +124,11 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(320, 12);
+            this.button2.Location = new System.Drawing.Point(39, 39);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(93, 21);
+            this.button2.Size = new System.Drawing.Size(152, 21);
             this.button2.TabIndex = 3;
-            this.button2.Text = "button2";
+            this.button2.Text = "Connect to LaserOS";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
@@ -793,7 +794,7 @@
             this.groupBox1.Controls.Add(this.checkBox31);
             this.groupBox1.Controls.Add(this.checkBox33);
             this.groupBox1.Controls.Add(this.checkBox32);
-            this.groupBox1.Location = new System.Drawing.Point(12, 39);
+            this.groupBox1.Location = new System.Drawing.Point(12, 108);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(172, 171);
             this.groupBox1.TabIndex = 70;
@@ -817,11 +818,22 @@
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
+            // checkBox65
+            // 
+            this.checkBox65.AutoSize = true;
+            this.checkBox65.Enabled = false;
+            this.checkBox65.Location = new System.Drawing.Point(18, 43);
+            this.checkBox65.Name = "checkBox65";
+            this.checkBox65.Size = new System.Drawing.Size(15, 14);
+            this.checkBox65.TabIndex = 73;
+            this.checkBox65.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(625, 290);
+            this.Controls.Add(this.checkBox65);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.groupBox1);
@@ -914,6 +926,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.CheckBox checkBox65;
     }
 }
 
