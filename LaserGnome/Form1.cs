@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO.Ports;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApplication1;
 
 namespace Lasergnome
 {
@@ -19,6 +12,7 @@ namespace Lasergnome
         Arduinome arduinome;
         Timer updateStateTimer = new Timer();
         int currentEffect = 0;
+        IntPtr laserOSWindow = IntPtr.Zero;
 
         public Form1()
         {
@@ -76,21 +70,13 @@ namespace Lasergnome
         {
             if (number > -1 && number < 8)
             {
-                StringBuilder r = new System.Text.StringBuilder();
-
-                IntPtr laserOSWindow = FindWindow(null, "LaserOS v0.9.0 BETA - Visualizer");
-
-                if (laserOSWindow == IntPtr.Zero)
+                if (laserOSWindow != IntPtr.Zero)
                 {
-                    MessageBox.Show("LaserOS is not running.");
-                    return;
+                    IntPtr currentWindow = GetForegroundWindow();
+                    SetForegroundWindow(laserOSWindow);
+                    SendKeys.Send(number.ToString());
+                    SetForegroundWindow(currentWindow);
                 }
-
-                // Make Calculator the foreground application and send it 
-                // a set of calculations.
-                SetForegroundWindow(laserOSWindow);
-
-                SendKeys.Send(number.ToString());
                 currentEffect = number;
                 arduinome.setRow(7, false, false, false, false, false, false, false, false);
             }
@@ -102,9 +88,28 @@ namespace Lasergnome
         [DllImport("User32.Dll")]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
 
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
         private void UpdateStateTimer_Tick(object sender, EventArgs e)
         {
+            // Toggle selected effect led.
             arduinome.setLed((byte)currentEffect, 7, !arduinome.GetLedState(currentEffect, 7));
+
+            #region Check for laserOS application.
+            laserOSWindow = IntPtr.Zero;
+            foreach (string item in EnumDesktopWindows.GetDesktopWindowsCaptions())
+            {
+                if (item.StartsWith("LaserOS ") && item.EndsWith("Visualizer"))
+                {
+                    laserOSWindow = FindWindow(null, item);
+                    break;
+                }
+            }
+
+            if (laserOSWindow != IntPtr.Zero) isConnectedToLaserOS.Checked = true;
+            else isConnectedToLaserOS.Checked = false;
+            #endregion
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -133,7 +138,7 @@ namespace Lasergnome
 
         private void button2_Click(object sender, EventArgs e)
         {
-
+            laserOSWindow = FindWindow(null, "LaserOS ? - Visualizer");
         }
 
         private void button3_Click(object sender, EventArgs e)

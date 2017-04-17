@@ -1,0 +1,9 @@
+C:\Users\otther\Source\Repos\Lasergnome\obj\Debug\Lasergnome.Form1.resources
+C:\Users\otther\Source\Repos\Lasergnome\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\otther\Source\Repos\Lasergnome\obj\Debug\LaserGnome.csproj.GenerateResource.Cache
+C:\Users\otther\Source\Repos\Lasergnome\obj\Debug\WindowsFormsApplication1.exe
+C:\Users\otther\Source\Repos\Lasergnome\obj\Debug\WindowsFormsApplication1.pdb
+C:\Users\otther\Source\Repos\Lasergnome\bin\Debug\WindowsFormsApplication1.exe.config
+C:\Users\otther\Source\Repos\Lasergnome\bin\Debug\WindowsFormsApplication1.exe
+C:\Users\otther\Source\Repos\Lasergnome\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\otther\Source\Repos\Lasergnome\obj\Debug\LaserGnome.csprojResolveAssemblyReference.cache
