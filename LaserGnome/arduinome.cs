@@ -12,6 +12,7 @@ class Arduinome
 
     private SerialPort port = new SerialPort();
     private BitMatrix buttons;
+    private BitMatrix leds;
     processSerialDataDelegate del;
 
     public enum messageTypes
@@ -75,9 +76,20 @@ class Arduinome
         return buttons[x, y];
     }
 
+    public BitMatrix GetLedStates()
+    {
+        return leds;
+    }
+
+    public bool GetLedState(int x, int y)
+    {
+        return leds[x, y];
+    }
+
     public Arduinome()
     {
         buttons = new BitMatrix(8, 8);
+        leds = new BitMatrix(8, 8);
 
         port.DataBits = 8;
         port.Parity = Parity.None;
@@ -121,18 +133,18 @@ class Arduinome
         }
     }
 
-    private void OnButtonDown(int rowIndex, int columnIndex)
+    private void OnButtonDown(int x, int y)
     {
-        ButtonEventArgs ev = new ButtonEventArgs(columnIndex, rowIndex);
+        ButtonEventArgs ev = new ButtonEventArgs(x, y);
         if (ButtonDown != null) ButtonDown(this, ev);
     }
 
     public delegate void ButtonDownEventHandler(object sender, ButtonEventArgs e);
     public event ButtonDownEventHandler ButtonDown;
 
-    private void OnButtonUp(int rowIndex, int columnIndex)
+    private void OnButtonUp(int x, int y)
     {
-        ButtonEventArgs ev = new ButtonEventArgs(columnIndex, rowIndex);
+        ButtonEventArgs ev = new ButtonEventArgs(x, y);
         if (ButtonUp != null) ButtonUp(this, ev);
     }
 
@@ -157,6 +169,65 @@ class Arduinome
             byte onoff = (byte)(state == true ? 1 : 0);
             byte data0 = (byte)(((byte)messageTypes.messageTypeLedStateChange << 4) | onoff);
             byte data1 = (byte)((x << 4) | y);
+
+            port.Write(new byte[] { data0, data1 }, 0, 2);
+            leds[x, y] = state;
+        }
+    }
+
+    public void setColumn(byte x, bool y1, bool y2, bool y3, bool y4, bool y5, bool y6, bool y7, bool y8)
+    {
+        if (port.IsOpen)
+        {
+            byte data0 = (byte)(((byte)messageTypes.messageTypeLedSetRow << 4) | x);
+            byte data1 = 0;
+
+            if (y1) data1 += 1;
+            if (y2) data1 += 2;
+            if (y3) data1 += 4;
+            if (y4) data1 += 8;
+            if (y5) data1 += 16;
+            if (y6) data1 += 32;
+            if (y7) data1 += 64;
+            if (y8) data1 += 128;
+
+            leds[x, 0] = y1;
+            leds[x, 1] = y2;
+            leds[x, 2] = y3;
+            leds[x, 3] = y4;
+            leds[x, 4] = y5;
+            leds[x, 5] = y6;
+            leds[x, 6] = y7;
+            leds[x, 7] = y8;
+
+            port.Write(new byte[] { data0, data1 }, 0, 2);
+        }
+    }
+
+    public void setRow(byte y, bool x1, bool x2, bool x3, bool x4, bool x5, bool x6, bool x7, bool x8 )
+    {
+        if (port.IsOpen)
+        {
+            byte data0 = (byte)(((byte)messageTypes.messageTypeLedSetRow << 4) | y);
+            byte data1 = 0;
+
+            if (x1) data1 += 1;
+            if (x2) data1 += 2;
+            if (x3) data1 += 4;
+            if (x4) data1 += 8;
+            if (x5) data1 += 16;
+            if (x6) data1 += 32;
+            if (x7) data1 += 64;
+            if (x8) data1 += 128;
+
+            leds[0, y] = x1;
+            leds[1, y] = x2;
+            leds[2, y] = x3;
+            leds[3, y] = x4;
+            leds[4, y] = x5;
+            leds[5, y] = x6;
+            leds[6, y] = x7;
+            leds[7, y] = x8;
 
             port.Write(new byte[] { data0, data1 }, 0, 2);
         }

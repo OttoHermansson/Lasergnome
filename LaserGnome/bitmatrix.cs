@@ -92,7 +92,7 @@ public class BitMatrix
     /// <param name="value"></param>
     private void OnValueChanged(int rowIndex, int columnIndex, bool value)
     {
-        BitmatrixValueChangedEventArgs ev = new BitmatrixValueChangedEventArgs(columnIndex, rowIndex, value);
+        BitmatrixValueChangedEventArgs ev = new BitmatrixValueChangedEventArgs(rowIndex, columnIndex, value);
         if (ValueChanged != null) ValueChanged(this, ev);
     }
 

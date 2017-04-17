@@ -18,6 +18,7 @@ namespace Lasergnome
     {
         Arduinome arduinome;
         Timer updateStateTimer = new Timer();
+        int currentEffect = 0;
 
         public Form1()
         {
@@ -26,11 +27,28 @@ namespace Lasergnome
             arduinome = new Arduinome();
 
             arduinome.ButtonDown += ButtonDown;
+            arduinome.ButtonUp += ButtonUp;
 
             updateStateTimer.Tick += UpdateStateTimer_Tick;
-            updateStateTimer.Interval = 100;
+            updateStateTimer.Interval = 250;
             updateStateTimer.Enabled = true;
             updateStateTimer.Start();
+        }
+
+        private void ButtonUp(object sender, ButtonEventArgs e)
+        {
+            HandleButtonUp(e.X, e.Y);
+        }
+
+        public void HandleButtonUp(int x, int y)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<int, int>(HandleButtonUp), new object[] { x, y });
+                return;
+            }
+
+            arduinome.setLed((byte)x, (byte)y, false);
         }
 
         private void ButtonDown(object sender, ButtonEventArgs e)
@@ -46,6 +64,8 @@ namespace Lasergnome
                 return;
             }
 
+            arduinome.setLed((byte)x, (byte)y, true);
+
             // Effect button.
             if (y == 7) {
                 SendEffectKey(x);
@@ -56,20 +76,35 @@ namespace Lasergnome
         {
             if (number > -1 && number < 8)
             {
+                StringBuilder r = new System.Text.StringBuilder();
+
+                IntPtr laserOSWindow = FindWindow(null, "LaserOS v0.9.0 BETA - Visualizer");
+
+                if (laserOSWindow == IntPtr.Zero)
+                {
+                    MessageBox.Show("LaserOS is not running.");
+                    return;
+                }
+
+                // Make Calculator the foreground application and send it 
+                // a set of calculations.
+                SetForegroundWindow(laserOSWindow);
+
                 SendKeys.Send(number.ToString());
-                SendKeys.SendWait(number.ToString());
+                currentEffect = number;
+                arduinome.setRow(7, false, false, false, false, false, false, false, false);
             }
         }
 
         [DllImport("User32.Dll")]
-        public static extern int FindWindow(string lpClassName, string lpWindowName);
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         [DllImport("User32.Dll")]
-        public static extern int GetClassName(int hwnd, StringBuilder lpClassName, int nMaxCount);
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         private void UpdateStateTimer_Tick(object sender, EventArgs e)
         {
-            showButtonStatus();
+            arduinome.setLed((byte)currentEffect, 7, !arduinome.GetLedState(currentEffect, 7));
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -98,11 +133,7 @@ namespace Lasergnome
 
         private void button2_Click(object sender, EventArgs e)
         {
-            StringBuilder r = new System.Text.StringBuilder();
 
-            int i = FindWindow(null, "LaserOS v0.9.0 BETA - Visualizer");
-            int x = GetClassName(i, r, r.Capacity);
-            MessageBox.Show(r.ToString());/// show our found classname.
         }
 
         private void button3_Click(object sender, EventArgs e)
