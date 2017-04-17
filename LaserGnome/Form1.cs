@@ -219,5 +219,10 @@ namespace Lasergnome
                 }
             }
         }
+
+        private void trackBar1_ValueChanged(object sender, EventArgs e)
+        {
+            arduinome.setIntensity((byte)trackBar1.Value);
+        }
     }
 }
