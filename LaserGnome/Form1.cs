@@ -1,6 +1,4 @@
-﻿using IniParser;
-using IniParser.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
@@ -80,19 +78,34 @@ namespace Lasergnome
                 int buttonNumber = (y * 8) + x +1;
                 if (buttonMapping.Any(a => a.Attribute("id").Value == buttonNumber.ToString()))
                 {
-
                     XElement button = buttonMapping.First(a => a.Attribute("id").Value == buttonNumber.ToString());
-                    SendKey(button.Descendants("pattern").First().Attribute("key").Value);
 
-                    int oldy = currentPattern / 8;
-                    int oldx = currentPattern - (oldy * 8);
-                    arduinome.setLed((byte)oldx, (byte)oldy, false);
-                    currentPattern = buttonNumber - 1;
+                    if (button.Descendants("pattern").Count() == 1)
+                    {
+                        SendKey(button.Descendants("pattern").First().Attribute("key").Value);
+
+                        int oldy = currentPattern / 8;
+                        int oldx = currentPattern - (oldy * 8);
+                        arduinome.setLed((byte)oldx, (byte)oldy, false);
+                        currentPattern = buttonNumber - 1;
+                    }
 
                     if (button.Descendants("effect").Count() == 1)
                     {
-                        string effect = button.Descendants("effect").First().Attribute("id").Value;
+                        string effect = button.Descendants("effect").First().Attribute("key").Value;
                         SendEffectKey(int.Parse(effect));
+                    }
+
+                    if (button.Descendants("special").Count() == 1)
+                    {
+                        string func = button.Descendants("special").First().Attribute("key").Value;
+
+                        switch (func)
+                        {
+                            case "[random]":
+                                SendKey("+{A}");
+                                break;
+                        }
                     }
                 }
             }
