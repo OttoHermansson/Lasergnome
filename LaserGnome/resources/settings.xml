@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <settings>
   <patterns>
+    <!-- Button id starts at top left with one and end on second row from the bottom with 56. -->
     <button id="1">
       <pattern key="a"/>
       <effect id="4"/>
@@ -24,7 +25,7 @@
       <pattern key="h"/>
       <effect id="4"/>
     </button>
-    <button id="55">
+    <button id="56">
       <pattern key="g"/>
       <effect id="4"/>
     </button>

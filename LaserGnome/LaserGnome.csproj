@@ -36,6 +36,10 @@
       <HintPath>packages\ini-parser.2.4.0\lib\net20\INIFileParser.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="interop.UIAutomationCore">
+      <HintPath>..\interop.UIAutomationCore.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

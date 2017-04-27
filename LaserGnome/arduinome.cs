@@ -63,6 +63,7 @@ class Arduinome
 
     public void Close()
     {
+        rebootDevice();
         port.Close();
     }
 
