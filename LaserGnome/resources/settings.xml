@@ -1,18 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <settings>
   <patterns>
-    <!-- Button id starts at top left with one and end on second row from the bottom with 56. -->
+    <!-- Example of special functions -->
+    <button id="8">
+      <special key="[random]"/>
+    </button>
+
+    <!-- Pattern with or without effects.-->
     <button id="1">
       <pattern key="a"/>
-      <effect id="4"/>
+      <effect key="4"/>
     </button>
     <button id="2">
       <pattern key="b"/>
-      <effect id="0"/>
+      <effect key="0"/>
     </button>
     <button id="3">
       <pattern key="c"/>
-      <effect id="6"/>
+      <effect key="6"/>
     </button>
     <button id="4">
       <pattern key="d"/>
@@ -23,11 +28,12 @@
     </button>
     <button id="17">
       <pattern key="h"/>
-      <effect id="4"/>
+      <effect key="4"/>
     </button>
-    <button id="56">
+    <button id="55">
       <pattern key="g"/>
-      <effect id="4"/>
+      <effect key="4"/>
     </button>
+
   </patterns>
 </settings>

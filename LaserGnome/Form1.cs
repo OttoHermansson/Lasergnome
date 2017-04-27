@@ -1,7 +1,4 @@
-﻿using IniParser;
-using IniParser.Model;
-using interop.UIAutomationCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
@@ -81,19 +78,34 @@ namespace Lasergnome
                 int buttonNumber = (y * 8) + x +1;
                 if (buttonMapping.Any(a => a.Attribute("id").Value == buttonNumber.ToString()))
                 {
-
                     XElement button = buttonMapping.First(a => a.Attribute("id").Value == buttonNumber.ToString());
-                    SendKey(button.Descendants("pattern").First().Attribute("key").Value);
 
-                    int oldy = currentPattern / 8;
-                    int oldx = currentPattern - (oldy * 8);
-                    arduinome.setLed((byte)oldx, (byte)oldy, false);
-                    currentPattern = buttonNumber - 1;
+                    if (button.Descendants("pattern").Count() == 1)
+                    {
+                        SendKey(button.Descendants("pattern").First().Attribute("key").Value);
+
+                        int oldy = currentPattern / 8;
+                        int oldx = currentPattern - (oldy * 8);
+                        arduinome.setLed((byte)oldx, (byte)oldy, false);
+                        currentPattern = buttonNumber - 1;
+                    }
 
                     if (button.Descendants("effect").Count() == 1)
                     {
-                        string effect = button.Descendants("effect").First().Attribute("id").Value;
+                        string effect = button.Descendants("effect").First().Attribute("key").Value;
                         SendEffectKey(int.Parse(effect));
+                    }
+
+                    if (button.Descendants("special").Count() == 1)
+                    {
+                        string func = button.Descendants("special").First().Attribute("key").Value;
+
+                        switch (func)
+                        {
+                            case "[random]":
+                                SendKey("+{A}");
+                                break;
+                        }
                     }
                 }
             }
@@ -141,8 +153,7 @@ namespace Lasergnome
 
             #region Check for laserOS application.
             laserOSWindow = IntPtr.Zero;
-            string[] windows = EnumDesktopWindows.GetDesktopWindowsCaptions();
-            foreach (string item in windows)
+            foreach (string item in EnumDesktopWindows.GetDesktopWindowsCaptions())
             {
                 if (item.StartsWith("LaserOS ") && item.EndsWith("Visualizer"))
                 {
@@ -171,18 +182,53 @@ namespace Lasergnome
             if (!arduinome.IsOpen())
             {
                 arduinome.Open(comboBox1.SelectedItem as string, 57200);
-                if (arduinome.IsOpen()) {
-                    button1.Text = "Close";
-                    comboBox1.Enabled = false;
-                }
+                button1.Text = "Close";
             }
             else
             {
                 arduinome.Close();
-                if (!arduinome.IsOpen())
+                button1.Text = "Open";
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            laserOSWindow = FindWindow(null, "LaserOS ? - Visualizer");
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            for (byte y = 0; y < 8; y++)
+            {
+                for (byte x = 0; x < 8; x++)
                 {
-                    button1.Text = "Open";
-                    comboBox1.Enabled = true;
+                    arduinome.setLed(x, y, false);
+                }
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            arduinome.rebootDevice();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            arduinome.ledTest(true);
+        }
+
+
+        private void showButtonStatus()
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                for (int x = 0; x < 8; x++)
+                {
+                    int id = ((y * 8) + x) + 1;
+
+                    CheckBox ctn = this.Controls.Find("checkBox" + id.ToString(), true).First() as CheckBox;
+                    ctn.Checked = arduinome.GetButtonState(x, y);
+                    arduinome.setLed((byte)x, (byte)y, arduinome.GetButtonState(x, y));
                 }
             }
         }
@@ -190,15 +236,6 @@ namespace Lasergnome
         private void trackBar1_ValueChanged(object sender, EventArgs e)
         {
             arduinome.setIntensity((byte)trackBar1.Value);
-        }
-
-        private IUIAutomation _automation;
-
-        private void button2_Click_1(object sender, EventArgs e)
-        {
-            _automation = new CUIAutomation();
-            IUIAutomationElement laserOSElement = _automation.ElementFromHandle(FindWindow(null, "LaserOS v0.9.0 BETA - Visualizer"));
-            var children = laserOSElement.GetCachedChildren();
         }
     }
 }
