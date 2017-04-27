@@ -2,14 +2,32 @@
 <settings>
   <patterns>
     <!-- Example of special functions -->
-    <button id="8">
+    <button id="7" holdkey="false">
+      <special key="[preview]"/>
+    </button>
+    <button id="8" holdkey="true">
       <special key="[random]"/>
+    </button>
+    <button id="6" holdkey="false">
+      <special key="[bringtofront]"/>
     </button>
 
     <!-- Pattern with or without effects.-->
     <button id="1">
-      <pattern key="a"/>
-      <effect key="4"/>
+      <program repeat="true">
+        <step runfor="1000">
+          <pattern key="a"/>
+          <effect key="4"/>
+        </step>
+        <step runfor="2000">
+          <pattern key="b"/>
+          <effect key="3"/>
+        </step>
+        <step runfor="4000">
+          <pattern key="c"/>
+          <effect key="1"/>
+        </step>
+      </program>
     </button>
     <button id="2">
       <pattern key="b"/>
@@ -24,7 +42,7 @@
     </button>
     <button id="5">
       <pattern key="e"/>
-      <effect id="4"/>
+      <effect key="4"/>
     </button>
     <button id="17">
       <pattern key="h"/>
@@ -33,6 +51,7 @@
     <button id="55">
       <pattern key="g"/>
       <effect key="4"/>
+      <special key="[preview]"/>
     </button>
 
   </patterns>

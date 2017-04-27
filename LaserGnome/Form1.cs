@@ -19,6 +19,26 @@ namespace Lasergnome
         int currentPattern = 0;
         IntPtr laserOSWindow = IntPtr.Zero;
         IEnumerable<XElement> buttonMapping;
+        bool blinkState = false;
+        List<int> blinkingButtons = new List<int>();
+        IEnumerable<XElement> programSteps;
+        int programRepeat = -1;
+        int currentProgramstep = 0;
+        Timer programTimer = new Timer();
+
+
+        [DllImport("User32.Dll")]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("User32.Dll")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         public Form1()
         {
@@ -33,6 +53,8 @@ namespace Lasergnome
             updateStateTimer.Interval = 250;
             updateStateTimer.Enabled = true;
             updateStateTimer.Start();
+
+            programTimer.Tick += programTimer_Tick;
 
             XDocument data = XDocument.Load(Application.StartupPath + "\\resources\\settings.xml");
             buttonMapping = data.Descendants("button");      
@@ -73,41 +95,159 @@ namespace Lasergnome
             if (y == 7) {
                 SendEffectKey(x);
             }
-
+            
             if (y < 7) {
                 int buttonNumber = (y * 8) + x +1;
                 if (buttonMapping.Any(a => a.Attribute("id").Value == buttonNumber.ToString()))
                 {
                     XElement button = buttonMapping.First(a => a.Attribute("id").Value == buttonNumber.ToString());
 
-                    if (button.Descendants("pattern").Count() == 1)
+                    // Run program.
+                    if (button.Descendants("program").Count() == 1)
                     {
-                        SendKey(button.Descendants("pattern").First().Attribute("key").Value);
-
-                        int oldy = currentPattern / 8;
-                        int oldx = currentPattern - (oldy * 8);
-                        arduinome.setLed((byte)oldx, (byte)oldy, false);
-                        currentPattern = buttonNumber - 1;
-                    }
-
-                    if (button.Descendants("effect").Count() == 1)
-                    {
-                        string effect = button.Descendants("effect").First().Attribute("key").Value;
-                        SendEffectKey(int.Parse(effect));
-                    }
-
-                    if (button.Descendants("special").Count() == 1)
-                    {
-                        string func = button.Descendants("special").First().Attribute("key").Value;
-
-                        switch (func)
+                        programSteps = button.Descendants("program").First().Descendants("step");
+                        if(button.Descendants("program").First().Attribute("repeat") != null)
                         {
-                            case "[random]":
-                                SendKey("+{A}");
-                                break;
+                            if (button.Descendants("program").First().Attribute("repeat").Value == "true")
+                                programRepeat = -1;
+                            else
+                                programRepeat = int.Parse(button.Descendants("program").First().Attribute("repeat").Value);
                         }
+                        
+                        currentProgramstep = 0;
+                        runProgramStep();
+
+                        // Set the blinking button.
+                        removeBlinkingButton(currentPattern);
+                        currentPattern = buttonNumber - 1;
+                        addBlinkingButton(buttonNumber - 1);
+                    }
+                    else
+                    {
+                        stopProgram();
+                        #region Other commands
+                        if (button.Descendants("pattern").Count() == 1)
+                        {
+                            SendKey(button.Descendants("pattern").First().Attribute("key").Value);
+                            removeBlinkingButton(currentPattern);
+                            currentPattern = buttonNumber - 1;
+                            addBlinkingButton(currentPattern);
+                        }
+
+                        if (button.Descendants("effect").Count() == 1)
+                        {
+                            string effect = button.Descendants("effect").First().Attribute("key").Value;
+                            SendEffectKey(int.Parse(effect));
+                        }
+
+
+
+                        if (button.Descendants("special").Count() == 1)
+                        {
+                            string func = button.Descendants("special").First().Attribute("key").Value;
+
+                            switch (func)
+                            {
+                                case "[random]":
+                                    SendKey("+{a}");
+                                    break;
+                                case "[preview]":
+                                    SendKey("+{s}");
+                                    break;
+                                case "[bringtofront]":
+                                    if (laserOSWindow != IntPtr.Zero)
+                                    {
+                                        ShowWindow(laserOSWindow, 9);
+                                        SetForegroundWindow(laserOSWindow);
+                                    }
+                                    break;
+                            }
+
+                            if (button.Attribute("holdkey") == null || button.Attribute("holdkey").Value == "true")
+                            {
+                                removeBlinkingButton(currentPattern);
+                                currentPattern = buttonNumber - 1;
+                                addBlinkingButton(currentPattern);
+                            }
+                        }
+                        #endregion
                     }
                 }
+            }
+        }
+
+        private void stopProgram()
+        {
+            programTimer.Enabled = false;
+            programTimer.Stop();
+        }
+
+        private void runProgramStep()
+        {
+            XElement step = programSteps.ElementAt(currentProgramstep);
+            int time = int.Parse(step.Attribute("runfor").Value);
+
+            if (step.Descendants("pattern").Count() == 1)
+            {
+                SendKey(step.Descendants("pattern").First().Attribute("key").Value);
+            }
+
+            if (step.Descendants("effect").Count() == 1)
+            {
+                string effect = step.Descendants("effect").First().Attribute("key").Value;
+                SendEffectKey(int.Parse(effect));
+            }
+
+            if (programRepeat == -1)
+            {
+                if (programSteps.Count() > currentProgramstep + 1)
+                    currentProgramstep++;
+                else
+                    currentProgramstep = 0;
+            }
+            else if (programRepeat > 0)
+            {
+                if (programSteps.Count() > currentProgramstep + 1)
+                    currentProgramstep++;
+                else
+                {
+                    currentProgramstep = 0;
+                    programRepeat--;
+                }
+            }
+
+            if (programRepeat != 0)
+            {
+                programTimer.Interval = time;
+                programTimer.Enabled = true;
+                programTimer.Start();
+            }
+            else
+                stopProgram();
+
+        }
+
+        private void programTimer_Tick(object sender, EventArgs e)
+        {
+            runProgramStep();
+        }
+
+        private void addBlinkingButton(int buttonNo)
+        {
+            if(!blinkingButtons.Contains(buttonNo)) {
+                blinkingButtons.Add(buttonNo);
+            }
+        }
+
+        private void removeBlinkingButton(int buttonNo)
+        {
+            if (blinkingButtons.Contains(buttonNo))
+            {
+                blinkingButtons.Remove(buttonNo);
+                int y = buttonNo / 8;
+                int x = buttonNo - (y * 8);
+
+                arduinome.setLed((byte)x, (byte)y, false);
             }
         }
 
@@ -127,29 +267,24 @@ namespace Lasergnome
             if (number > -1 && number < 8)
             {
                 SendKey(number.ToString());
+                removeBlinkingButton(currentEffect + 56);
                 currentEffect = number;
-                arduinome.setRow(7, false, false, false, false, false, false, false, false);
+                addBlinkingButton(currentEffect + 56);
             }
         }
 
-        [DllImport("User32.Dll")]
-        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-        [DllImport("User32.Dll")]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        static extern IntPtr GetForegroundWindow();
-
         private void UpdateStateTimer_Tick(object sender, EventArgs e)
         {
-            // Toggle selected effect led.
-            arduinome.setLed((byte)currentEffect, 7, !arduinome.GetLedState(currentEffect, 7));
+            #region Flash blinking led.
+            foreach (int button in blinkingButtons)
+            {
+                int oldy = button / 8;
+                int oldx = button - (oldy * 8);
 
-            int oldy = currentPattern / 8;
-            int oldx = currentPattern - (oldy * 8);
-
-            arduinome.setLed((byte)oldx, (byte)oldy, !arduinome.GetLedState(oldx, oldy));
+                arduinome.setLed((byte)oldx, (byte)oldy, blinkState);
+            }
+            blinkState = !blinkState;
+            #endregion
 
             #region Check for laserOS application.
             laserOSWindow = IntPtr.Zero;
@@ -183,53 +318,13 @@ namespace Lasergnome
             {
                 arduinome.Open(comboBox1.SelectedItem as string, 57200);
                 button1.Text = "Close";
+                comboBox1.Enabled = false;
             }
             else
             {
                 arduinome.Close();
                 button1.Text = "Open";
-            }
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            laserOSWindow = FindWindow(null, "LaserOS ? - Visualizer");
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            for (byte y = 0; y < 8; y++)
-            {
-                for (byte x = 0; x < 8; x++)
-                {
-                    arduinome.setLed(x, y, false);
-                }
-            }
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            arduinome.rebootDevice();
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            arduinome.ledTest(true);
-        }
-
-
-        private void showButtonStatus()
-        {
-            for (int y = 0; y < 8; y++)
-            {
-                for (int x = 0; x < 8; x++)
-                {
-                    int id = ((y * 8) + x) + 1;
-
-                    CheckBox ctn = this.Controls.Find("checkBox" + id.ToString(), true).First() as CheckBox;
-                    ctn.Checked = arduinome.GetButtonState(x, y);
-                    arduinome.setLed((byte)x, (byte)y, arduinome.GetButtonState(x, y));
-                }
+                comboBox1.Enabled = true;
             }
         }
 
