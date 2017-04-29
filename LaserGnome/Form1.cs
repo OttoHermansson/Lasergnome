@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -22,6 +24,11 @@ namespace Lasergnome
         IEnumerable<XElement> buttonMapping;
         bool blinkState = false;
         List<int> blinkingButtons = new List<int>();
+        List<int> staticButtons = new List<int>();
+
+        bool globalRandomIsRunning = false;
+        int globalRandomButton = -1;
+
         IEnumerable<XElement> programSteps;
         int programRepeat = -1;
         int programCurrentStep = 0;
@@ -29,8 +36,14 @@ namespace Lasergnome
         int programGlobalRunfor = 0;
         Timer programTimer = new Timer();
 
+        private const int WM_CLOSE = 16;
+        private const int BN_CLICKED = 245;
+
         [DllImport("User32.Dll")]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr FindWindowEx(IntPtr parentHandle, IntPtr childAfter, string className, string windowTitle);
 
         [DllImport("User32.Dll")]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -41,6 +54,92 @@ namespace Lasergnome
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int SendMessage(int hWnd, int msg, int wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetNextWindow(IntPtr hWnd, uint wCmd);
+
+        [DllImport("user32.dll")]
+        static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
+
+        [DllImport("user32.dll")]
+        internal static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs, int cbSize);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
+
+        [DllImport("user32.dll")]
+        public static extern int PostMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        static extern bool GetCursorPos(ref Point lpPoint);
+
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        public static extern int BitBlt(IntPtr hDC, int x, int y, int nWidth, int nHeight, IntPtr hSrcDC, int xSrc, int ySrc, int dwRop);
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        internal struct INPUT
+        {
+            public UInt32 Type;
+            public MOUSEKEYBDHARDWAREINPUT Data;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        internal struct MOUSEKEYBDHARDWAREINPUT
+        {
+            [FieldOffset(0)]
+            public MOUSEINPUT Mouse;
+        }
+
+        internal struct MOUSEINPUT
+        {
+            public Int32 X;
+            public Int32 Y;
+            public UInt32 MouseData;
+            public UInt32 Flags;
+            public UInt32 Time;
+            public IntPtr ExtraInfo;
+        }
+
+        public static void ClickOnPoint(IntPtr wndHandle, Point clientPoint)
+        {
+            var oldPos = Cursor.Position;
+
+            /// get screen coordinates
+            // ClientToScreen(wndHandle, ref clientPoint);
+
+            /// set cursor on coords, and press mouse
+            Cursor.Position = new Point(clientPoint.X, clientPoint.Y);
+
+            var inputMouseDown = new INPUT();
+            inputMouseDown.Type = 0; /// input type mouse
+            inputMouseDown.Data.Mouse.Flags = 0x0002; /// left button down
+
+            var inputMouseUp = new INPUT();
+            inputMouseUp.Type = 0; /// input type mouse
+            inputMouseUp.Data.Mouse.Flags = 0x0004; /// left button up
+
+            var inputs = new INPUT[] { inputMouseDown, inputMouseUp };
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+
+            /// return mouse 
+            Cursor.Position = oldPos;
+        }
 
         public Form1()
         {
@@ -107,6 +206,14 @@ namespace Lasergnome
                     // Run program.
                     if (button.Descendants("program").Count() == 1)
                     {
+                        if (globalRandomIsRunning)
+                        {
+                            setRandomOff();
+                            removeStaticButton(globalRandomButton);
+                            globalRandomIsRunning = false;
+                        }
+                        removeBlinkingButton(currentPattern);
+                        #region Programs
                         programSteps = button.Descendants("program").First().Descendants("step");
                         if(button.Descendants("program").First().Attribute("repeat") != null)
                         {
@@ -133,16 +240,23 @@ namespace Lasergnome
                         runProgramStep();
 
                         // Set the blinking button.
-                        removeBlinkingButton(currentPattern);
                         currentPattern = buttonNumber - 1;
                         addBlinkingButton(buttonNumber - 1);
+                        #endregion
                     }
                     else
                     {
-                        stopProgram();
                         #region Other commands
+                        stopProgram();
                         if (button.Descendants("pattern").Count() == 1)
                         {
+                            if (globalRandomIsRunning)
+                            {
+                                setRandomOff();
+                                removeStaticButton(globalRandomButton);
+                                globalRandomIsRunning = false;
+                            }
+
                             SendKey(button.Descendants("pattern").First().Attribute("key").Value);
                             removeBlinkingButton(currentPattern);
                             currentPattern = buttonNumber - 1;
@@ -155,8 +269,6 @@ namespace Lasergnome
                             SendEffectKey(int.Parse(effect));
                         }
 
-
-
                         if (button.Descendants("special").Count() == 1)
                         {
                             string func = button.Descendants("special").First().Attribute("key").Value;
@@ -164,7 +276,22 @@ namespace Lasergnome
                             switch (func)
                             {
                                 case "[random]":
-                                    SendKey("+{a}");
+                                    removeBlinkingButton(currentPattern);
+                                    globalRandomButton = buttonNumber - 1;
+                                    Console.WriteLine(globalRandomIsRunning.ToString());
+                                    if (globalRandomIsRunning)
+                                    {
+                                        setRandomOff();
+                                        removeStaticButton(buttonNumber - 1);
+                                        globalRandomIsRunning = false;
+                                    }
+                                    else
+                                    {
+                                        setRandomOn();
+                                        addStaticButton(buttonNumber - 1);
+                                        globalRandomIsRunning = true;
+                                    }
+
                                     break;
                                 case "[preview]":
                                     SendKey("+{s}");
@@ -177,13 +304,6 @@ namespace Lasergnome
                                     }
                                     break;
                             }
-
-                            if (button.Attribute("holdkey") == null || button.Attribute("holdkey").Value == "true")
-                            {
-                                removeBlinkingButton(currentPattern);
-                                currentPattern = buttonNumber - 1;
-                                addBlinkingButton(currentPattern);
-                            }
                         }
                         #endregion
                     }
@@ -191,10 +311,119 @@ namespace Lasergnome
             }
         }
 
+        private void resetAll()
+        {
+            stopProgram();
+            removeBlinkingButton(currentPattern);
+
+            if (globalRandomIsRunning)
+            {
+                setRandomOff();
+                removeStaticButton(globalRandomButton);
+                globalRandomIsRunning = false;
+            }
+        }
+
+        private bool setRandomOn()
+        {
+            if (laserOSWindow != IntPtr.Zero)
+            {
+                Point oldPos = Cursor.Position;
+
+                var bmp = new Bitmap(561, 310, PixelFormat.Format32bppArgb);
+                Graphics graphics = Graphics.FromImage(bmp);
+
+                var inputMouseDown = new INPUT();
+                inputMouseDown.Type = 0; /// input type mouse
+                inputMouseDown.Data.Mouse.Flags = 0x0002; /// left button down
+
+                var inputMouseUp = new INPUT();
+                inputMouseUp.Type = 0; /// input type mouse
+                inputMouseUp.Data.Mouse.Flags = 0x0004; /// left button up
+                var inputs = new INPUT[] { inputMouseDown, inputMouseUp };
+
+                while (GetForegroundWindow() != laserOSWindow)
+                    SetForegroundWindow(laserOSWindow);
+
+                RECT rct = new RECT();
+                GetWindowRect(laserOSWindow, ref rct);
+
+                graphics.CopyFromScreen(rct.Left, rct.Top, 0, 0, new Size((rct.Right - rct.Left), (rct.Bottom - rct.Top)), CopyPixelOperation.SourceCopy);
+                Color c = bmp.GetPixel(215, 245);
+
+                // 88 = off
+                // 121 = off
+                // 171 = on
+                if (c.B == 171) return true;
+
+                Point cursor = new Point(rct.Left + 215, rct.Top + 245);
+                while (Cursor.Position != cursor)
+                    Cursor.Position = cursor;
+
+                SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+                graphics.CopyFromScreen(rct.Left, rct.Top, 0, 0, new Size((rct.Right - rct.Left), (rct.Bottom - rct.Top)), CopyPixelOperation.SourceCopy);
+
+                c = bmp.GetPixel(215, 245);
+                if (c.B != 171) return false;
+            }
+
+            return true;
+        }
+
+        private bool setRandomOff()
+        {
+            if (laserOSWindow != IntPtr.Zero)
+            {
+                Point oldPos = Cursor.Position;
+
+                var bmp = new Bitmap(561, 310, PixelFormat.Format32bppArgb);
+                Graphics graphics = Graphics.FromImage(bmp);
+
+                var inputMouseDown = new INPUT();
+                inputMouseDown.Type = 0; /// input type mouse
+                inputMouseDown.Data.Mouse.Flags = 0x0002; /// left button down
+
+                var inputMouseUp = new INPUT();
+                inputMouseUp.Type = 0; /// input type mouse
+                inputMouseUp.Data.Mouse.Flags = 0x0004; /// left button up
+                var inputs = new INPUT[] { inputMouseDown, inputMouseUp };
+
+                while (GetForegroundWindow() != laserOSWindow)
+                    SetForegroundWindow(laserOSWindow);
+
+                RECT rct = new RECT();
+                GetWindowRect(laserOSWindow, ref rct);
+
+                graphics.CopyFromScreen(rct.Left, rct.Top, 0, 0, new Size((rct.Right - rct.Left), (rct.Bottom - rct.Top)), CopyPixelOperation.SourceCopy);
+                Color c = bmp.GetPixel(215, 245);
+
+                // 88 = off
+                // 121 = off
+                // 171 = on
+                if (c.B == 88 || c.B == 121) return true;
+
+                Point cursor = new Point(rct.Left + 215, rct.Top + 245);
+                while (Cursor.Position != cursor)
+                    Cursor.Position = cursor;
+
+                SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+                graphics.CopyFromScreen(rct.Left, rct.Top, 0, 0, new Size((rct.Right - rct.Left), (rct.Bottom - rct.Top)), CopyPixelOperation.SourceCopy);
+
+                c = bmp.GetPixel(215, 245);
+                if (c.B != 88 && c.B != 121) return false;
+            }
+
+            return true;
+        }
+
         private void stopProgram()
         {
-            programTimer.Enabled = false;
-            programTimer.Stop();
+            if(programTimer.Enabled)
+            {
+                programTimer.Enabled = false;
+                programTimer.Stop();
+                removeBlinkingButton(currentPattern);
+            }
         }
 
         private void runProgramStep()
@@ -276,6 +505,30 @@ namespace Lasergnome
             }
         }
 
+        private void addStaticButton(int buttonNo)
+        {
+            if (!staticButtons.Contains(buttonNo))
+            {
+                staticButtons.Add(buttonNo);
+                int y = buttonNo / 8;
+                int x = buttonNo - (y * 8);
+
+                arduinome.setLed((byte)x, (byte)y, true);
+            }
+        }
+
+        private void removeStaticButton(int buttonNo)
+        {
+            if (staticButtons.Contains(buttonNo))
+            {
+                staticButtons.Remove(buttonNo);
+                int y = buttonNo / 8;
+                int x = buttonNo - (y * 8);
+
+                arduinome.setLed((byte)x, (byte)y, false);
+            }
+        }
+
         private void SendKey(string data)
         {
             if (laserOSWindow != IntPtr.Zero)
@@ -303,7 +556,17 @@ namespace Lasergnome
 
         private void UpdateStateTimer_Tick(object sender, EventArgs e)
         {
-            #region Flash blinking led.
+            #region Set static leds.
+            foreach (int button in staticButtons)
+            {
+                int oldy = button / 8;
+                int oldx = button - (oldy * 8);
+
+                arduinome.setLed((byte)oldx, (byte)oldy, true);
+            }
+            #endregion
+
+            #region Flash blinking leds.
             foreach (int button in blinkingButtons)
             {
                 int oldy = button / 8;

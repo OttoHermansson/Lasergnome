@@ -14,6 +14,10 @@
       </button>
     -->
 
+    <button id="8" holdkey="true">
+      <special key="[random]"/>
+    </button>
+
     <!-- Pattern with or without effects.-->
     <button id="1">
       <program repeat="true" random="false" runfor="4000">
