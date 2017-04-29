@@ -65,7 +65,7 @@ namespace BeatDetector
 
             if (!result)
             {
-                throw new BassInitException(Bass.BASS_ErrorGetCode().ToString());
+                // throw new BassInitException(Bass.BASS_ErrorGetCode().ToString());
             }
 
             // Initialize WASAPI
@@ -73,7 +73,7 @@ namespace BeatDetector
 
             if (!result)
             {
-                throw new BassWasapiInitException(Bass.BASS_ErrorGetCode().ToString());
+                // throw new BassWasapiInitException(Bass.BASS_ErrorGetCode().ToString());
             }
 
             BassWasapi.BASS_WASAPI_Start();

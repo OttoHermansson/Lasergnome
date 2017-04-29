@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
-using SoundTouch;
+using BeatDetector;
 
 namespace Lasergnome
 {
@@ -24,9 +24,10 @@ namespace Lasergnome
         List<int> blinkingButtons = new List<int>();
         IEnumerable<XElement> programSteps;
         int programRepeat = -1;
-        int currentProgramstep = 0;
+        int programCurrentStep = 0;
+        bool programRandom = false;
+        int programGlobalRunfor = 0;
         Timer programTimer = new Timer();
-        BpmDetectInteger bpmDetect;
 
         [DllImport("User32.Dll")]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -44,9 +45,6 @@ namespace Lasergnome
         public Form1()
         {
             InitializeComponent();
-
-            bpmDetect = new BpmDetectInteger(2, 24000);
-            
 
             arduinome = new Arduinome();
 
@@ -117,8 +115,21 @@ namespace Lasergnome
                             else
                                 programRepeat = int.Parse(button.Descendants("program").First().Attribute("repeat").Value);
                         }
-                        
-                        currentProgramstep = 0;
+
+                        if (button.Descendants("program").First().Attribute("random") != null)
+                        {
+                            if (button.Descendants("program").First().Attribute("random").Value == "true")
+                                programRandom = true;
+                            else
+                                programRandom = false;
+                        }
+
+                        if (button.Descendants("program").First().Attribute("runfor") != null)
+                            programGlobalRunfor = int.Parse(button.Descendants("program").First().Attribute("runfor").Value);
+                        else
+                            programGlobalRunfor = 5000;
+
+                        programCurrentStep = 0;
                         runProgramStep();
 
                         // Set the blinking button.
@@ -188,8 +199,10 @@ namespace Lasergnome
 
         private void runProgramStep()
         {
-            XElement step = programSteps.ElementAt(currentProgramstep);
-            int time = int.Parse(step.Attribute("runfor").Value);
+            XElement step = programSteps.ElementAt(programCurrentStep);
+            int time = programGlobalRunfor;
+            if (step.Attribute("runfor") != null)
+                time = int.Parse(step.Attribute("runfor").Value);
 
             if (step.Descendants("pattern").Count() == 1)
             {
@@ -202,21 +215,29 @@ namespace Lasergnome
                 SendEffectKey(int.Parse(effect));
             }
 
-            if (programRepeat == -1)
+            if (programRandom)
             {
-                if (programSteps.Count() > currentProgramstep + 1)
-                    currentProgramstep++;
-                else
-                    currentProgramstep = 0;
+                Random rnd = new Random();
+                programCurrentStep = rnd.Next(0, (programSteps.Count() - 1));
             }
-            else if (programRepeat > 0)
+            else
             {
-                if (programSteps.Count() > currentProgramstep + 1)
-                    currentProgramstep++;
-                else
+                if (programRepeat == -1)
                 {
-                    currentProgramstep = 0;
-                    programRepeat--;
+                    if (programSteps.Count() > programCurrentStep + 1)
+                        programCurrentStep++;
+                    else
+                        programCurrentStep = 0;
+                }
+                else if (programRepeat > 0)
+                {
+                    if (programSteps.Count() > programCurrentStep + 1)
+                        programCurrentStep++;
+                    else
+                    {
+                        programCurrentStep = 0;
+                        programRepeat--;
+                    }
                 }
             }
 
@@ -260,7 +281,10 @@ namespace Lasergnome
             if (laserOSWindow != IntPtr.Zero)
             {
                 IntPtr currentWindow = GetForegroundWindow();
-                SetForegroundWindow(laserOSWindow);
+
+                while (GetForegroundWindow() != laserOSWindow)
+                    SetForegroundWindow(laserOSWindow);
+
                 SendKeys.Send(data);
                 SetForegroundWindow(currentWindow);
             }
