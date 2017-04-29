@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
+using SoundTouch;
 
 namespace Lasergnome
 {
@@ -25,7 +26,7 @@ namespace Lasergnome
         int programRepeat = -1;
         int currentProgramstep = 0;
         Timer programTimer = new Timer();
-
+        BpmDetectInteger bpmDetect;
 
         [DllImport("User32.Dll")]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -43,6 +44,9 @@ namespace Lasergnome
         public Form1()
         {
             InitializeComponent();
+
+            bpmDetect = new BpmDetectInteger(2, 24000);
+            
 
             arduinome = new Arduinome();
 
