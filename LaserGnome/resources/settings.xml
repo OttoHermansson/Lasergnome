@@ -127,6 +127,92 @@
       <pattern key="g"/>
       <effect key="0"/>
     </button>
+    
+    <!-- Andra mönster -->
+    <button id="16">
+      <pattern key="h"/>
+      <effect key="0"/>
+    </button>
+    <button id="17">
+      <pattern key="i"/>
+      <effect key="0"/>
+    </button>
+    <button id="18">
+      <pattern key="j"/>
+      <effect key="0"/>
+    </button>
+    <button id="19">
+      <pattern key="k"/>
+      <effect key="0"/>
+    </button>
+    <button id="20">
+      <pattern key="l"/>
+      <effect key="0"/>
+    </button>
+    <button id="21">
+      <pattern key="m"/>
+      <effect key="0"/>
+    </button>
+    <button id="22">
+      <pattern key="n"/>
+      <effect key="0"/>
+    </button>
+    <button id="23">
+      <pattern key="o"/>
+      <effect key="0"/>
+    </button>
+    <button id="24">
+      <pattern key="p"/>
+      <effect key="0"/>
+    </button>
+    <button id="25">
+      <pattern key="q"/>
+      <effect key="0"/>
+    </button>
+    <button id="26">
+      <pattern key="r"/>
+      <effect key="0"/>
+    </button>
+    <button id="27">
+      <pattern key="s"/>
+      <effect key="0"/>
+    </button>
+    <button id="28">
+      <pattern key="t"/>
+      <effect key="0"/>
+    </button>
+    <button id="29">
+      <pattern key="u"/>
+      <effect key="0"/>
+    </button>
+    <button id="30">
+      <pattern key="v"/>
+      <effect key="0"/>
+    </button>
+    <button id="31">
+      <pattern key="w"/>
+      <effect key="0"/>
+    </button>
+    <button id="32">
+      <pattern key="x"/>
+      <effect key="0"/>
+    </button>
+    <button id="33">
+      <pattern key="y"/>
+      <effect key="0"/>
+    </button>
+    <button id="34">
+      <pattern key="z"/>
+      <effect key="0"/>
+    </button>
+    <button id="35">
+      <pattern key="8"/>
+      <effect key="0"/>
+    </button>
+    <button id="36">
+      <pattern key="9"/>
+      <effect key="0"/>
+    </button>
 
   </patterns>
 </settings>
