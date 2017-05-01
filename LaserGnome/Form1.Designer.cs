@@ -33,6 +33,9 @@
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.isConnectedToLaserOS = new System.Windows.Forms.CheckBox();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
+            this.laserOn = new System.Windows.Forms.CheckBox();
+            this.simulatorActive = new System.Windows.Forms.CheckBox();
+            this.runningAutoRandom = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -68,19 +71,55 @@
             // 
             // trackBar1
             // 
-            this.trackBar1.Location = new System.Drawing.Point(12, 111);
+            this.trackBar1.Location = new System.Drawing.Point(12, 131);
             this.trackBar1.Maximum = 15;
             this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(134, 45);
+            this.trackBar1.Size = new System.Drawing.Size(136, 45);
             this.trackBar1.TabIndex = 74;
             this.trackBar1.Value = 15;
             this.trackBar1.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
+            // 
+            // laserOn
+            // 
+            this.laserOn.AutoSize = true;
+            this.laserOn.Enabled = false;
+            this.laserOn.Location = new System.Drawing.Point(12, 62);
+            this.laserOn.Name = "laserOn";
+            this.laserOn.Size = new System.Drawing.Size(94, 17);
+            this.laserOn.TabIndex = 75;
+            this.laserOn.Text = "Laser is active";
+            this.laserOn.UseVisualStyleBackColor = true;
+            // 
+            // simulatorActive
+            // 
+            this.simulatorActive.AutoSize = true;
+            this.simulatorActive.Enabled = false;
+            this.simulatorActive.Location = new System.Drawing.Point(12, 85);
+            this.simulatorActive.Name = "simulatorActive";
+            this.simulatorActive.Size = new System.Drawing.Size(101, 17);
+            this.simulatorActive.TabIndex = 76;
+            this.simulatorActive.Text = "Simulator active";
+            this.simulatorActive.UseVisualStyleBackColor = true;
+            // 
+            // runningAutoRandom
+            // 
+            this.runningAutoRandom.AutoSize = true;
+            this.runningAutoRandom.Enabled = false;
+            this.runningAutoRandom.Location = new System.Drawing.Point(12, 108);
+            this.runningAutoRandom.Name = "runningAutoRandom";
+            this.runningAutoRandom.Size = new System.Drawing.Size(120, 17);
+            this.runningAutoRandom.TabIndex = 77;
+            this.runningAutoRandom.Text = "Auto Random mode";
+            this.runningAutoRandom.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(160, 168);
+            this.ClientSize = new System.Drawing.Size(160, 169);
+            this.Controls.Add(this.runningAutoRandom);
+            this.Controls.Add(this.simulatorActive);
+            this.Controls.Add(this.laserOn);
             this.Controls.Add(this.trackBar1);
             this.Controls.Add(this.isConnectedToLaserOS);
             this.Controls.Add(this.comboBox1);
@@ -105,6 +144,9 @@
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.CheckBox isConnectedToLaserOS;
         private System.Windows.Forms.TrackBar trackBar1;
+        private System.Windows.Forms.CheckBox laserOn;
+        private System.Windows.Forms.CheckBox simulatorActive;
+        private System.Windows.Forms.CheckBox runningAutoRandom;
     }
 }
 

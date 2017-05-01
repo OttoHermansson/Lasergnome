@@ -2,18 +2,6 @@
 <settings>
   <patterns>
     <!-- Example of special functions -->
-    <!--
-      <button id="7" holdkey="false">
-        <special key="[preview]"/>
-      </button>
-      <button id="8" holdkey="true">
-        <special key="[random]"/>
-      </button>
-      <button id="6" holdkey="false">
-        <special key="[bringtofront]"/>
-      </button>
-    -->
-
     <button id="8" holdkey="true">
       <special key="[random]"/>
     </button>
@@ -21,92 +9,12 @@
     <!-- Pattern with or without effects.-->
     <button id="1">
       <program repeat="true" random="false" runfor="4000">
-        <step runfor="30000">
+        <step runfor="15000">
           <pattern key="a"/>
           <effect key="6"/>
         </step>
-        <step>
-          <pattern key="h"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="i"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="j"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="k"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="l"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="m"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="n"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="o"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="p"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="q"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="r"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="s"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="t"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="u"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="v"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="w"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="x"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="y"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="z"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="8"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="9"/>
+        <step runfor="900000">
+          <special key="[random]"/>
           <effect key="0"/>
         </step>
       </program>
@@ -114,92 +22,12 @@
    
     <button id="2">
       <program repeat="true" random="false" runfor="4000">
-        <step runfor="30000">
+        <step runfor="15000">
           <pattern key="b"/>
           <effect key="6"/>
         </step>
-        <step>
-          <pattern key="h"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="i"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="j"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="k"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="l"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="m"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="n"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="o"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="p"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="q"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="r"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="s"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="t"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="u"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="v"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="w"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="x"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="y"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="z"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="8"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="9"/>
+        <step runfor="900000">
+          <special key="[random]"/>
           <effect key="0"/>
         </step>
       </program>
@@ -207,92 +35,12 @@
 
     <button id="3">
       <program repeat="true" random="false" runfor="4000">
-        <step runfor="30000">
+        <step runfor="15000">
           <pattern key="c"/>
           <effect key="6"/>
         </step>
-        <step>
-          <pattern key="h"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="i"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="j"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="k"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="l"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="m"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="n"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="o"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="p"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="q"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="r"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="s"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="t"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="u"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="v"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="w"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="x"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="y"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="z"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="8"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="9"/>
+        <step runfor="900000">
+          <special key="[random]"/>
           <effect key="0"/>
         </step>
       </program>
@@ -300,92 +48,12 @@
 
     <button id="4">
       <program repeat="true" random="false" runfor="4000">
-        <step runfor="30000">
+        <step runfor="15000">
           <pattern key="d"/>
           <effect key="6"/>
         </step>
-        <step>
-          <pattern key="h"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="i"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="j"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="k"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="l"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="m"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="n"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="o"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="p"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="q"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="r"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="s"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="t"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="u"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="v"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="w"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="x"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="y"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="z"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="8"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="9"/>
+        <step runfor="900000">
+          <special key="[random]"/>
           <effect key="0"/>
         </step>
       </program>
@@ -393,92 +61,12 @@
 
     <button id="5">
       <program repeat="true" random="false" runfor="4000">
-        <step runfor="30000">
+        <step runfor="15000">
           <pattern key="e"/>
           <effect key="6"/>
         </step>
-        <step>
-          <pattern key="h"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="i"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="j"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="k"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="l"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="m"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="n"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="o"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="p"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="q"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="r"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="s"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="t"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="u"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="v"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="w"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="x"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="y"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="z"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="8"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="9"/>
+        <step runfor="900000">
+          <special key="[random]"/>
           <effect key="0"/>
         </step>
       </program>
@@ -486,92 +74,12 @@
 
     <button id="6">
       <program repeat="true" random="false" runfor="4000">
-        <step runfor="30000">
+        <step runfor="15000">
           <pattern key="f"/>
           <effect key="6"/>
         </step>
-        <step>
-          <pattern key="h"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="i"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="j"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="k"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="l"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="m"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="n"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="o"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="p"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="q"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="r"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="s"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="t"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="u"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="v"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="w"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="x"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="y"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="z"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="8"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="9"/>
+        <step runfor="900000">
+          <special key="[random]"/>
           <effect key="0"/>
         </step>
       </program>
@@ -579,92 +87,12 @@
 
     <button id="7">
       <program repeat="true" random="false" runfor="4000">
-        <step runfor="30000">
+        <step runfor="15000">
           <pattern key="g"/>
           <effect key="6"/>
         </step>
-        <step>
-          <pattern key="h"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="i"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="j"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="k"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="l"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="m"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="n"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="o"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="p"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="q"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="r"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="s"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="t"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="u"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="v"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="w"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="x"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="y"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="z"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="8"/>
-          <effect key="0"/>
-        </step>
-        <step>
-          <pattern key="9"/>
+        <step runfor="900000">
+          <special key="[random]"/>
           <effect key="0"/>
         </step>
       </program>

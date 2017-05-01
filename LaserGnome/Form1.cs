@@ -416,6 +416,56 @@ namespace Lasergnome
             return true;
         }
 
+        private void sendPrevious()
+        { 
+            // send previous
+            var inputMouseDown = new INPUT();
+            inputMouseDown.Type = 0; /// input type mouse
+            inputMouseDown.Data.Mouse.Flags = 0x0002; /// left button down
+
+            var inputMouseUp = new INPUT();
+            inputMouseUp.Type = 0; /// input type mouse
+            inputMouseUp.Data.Mouse.Flags = 0x0004; /// left button up
+            var inputs = new INPUT[] { inputMouseDown, inputMouseUp };
+
+            while (GetForegroundWindow() != laserOSWindow)
+                SetForegroundWindow(laserOSWindow);
+
+            RECT rct = new RECT();
+            GetWindowRect(laserOSWindow, ref rct);
+
+            Point cursor = new Point(rct.Left + 281, rct.Top + 259);
+            while (Cursor.Position != cursor)
+                Cursor.Position = cursor;
+
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+        }
+
+        private void sendNext()
+        {
+            // send previous
+            var inputMouseDown = new INPUT();
+            inputMouseDown.Type = 0; /// input type mouse
+            inputMouseDown.Data.Mouse.Flags = 0x0002; /// left button down
+
+            var inputMouseUp = new INPUT();
+            inputMouseUp.Type = 0; /// input type mouse
+            inputMouseUp.Data.Mouse.Flags = 0x0004; /// left button up
+            var inputs = new INPUT[] { inputMouseDown, inputMouseUp };
+
+            while (GetForegroundWindow() != laserOSWindow)
+                SetForegroundWindow(laserOSWindow);
+
+            RECT rct = new RECT();
+            GetWindowRect(laserOSWindow, ref rct);
+
+            Point cursor = new Point(rct.Left + 340, rct.Top + 259);
+            while (Cursor.Position != cursor)
+                Cursor.Position = cursor;
+
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+        }
+
         private void stopProgram()
         {
             if(programTimer.Enabled)
@@ -428,6 +478,12 @@ namespace Lasergnome
 
         private void runProgramStep()
         {
+            if (globalRandomIsRunning)
+            {
+                setRandomOff();
+                globalRandomIsRunning = false;
+            }
+
             XElement step = programSteps.ElementAt(programCurrentStep);
             int time = programGlobalRunfor;
             if (step.Attribute("runfor") != null)
@@ -442,6 +498,17 @@ namespace Lasergnome
             {
                 string effect = step.Descendants("effect").First().Attribute("key").Value;
                 SendEffectKey(int.Parse(effect));
+            }
+
+            if (step.Descendants("special").Count() == 1)
+            {
+                string func = step.Descendants("special").First().Attribute("key").Value;
+                if(func == "[random]")
+                {
+                    setRandomOn();
+                    globalRandomIsRunning = true;
+                    sendNext();
+                }
             }
 
             if (programRandom)
@@ -479,6 +546,44 @@ namespace Lasergnome
             else
                 stopProgram();
 
+        }
+
+        private LaserOSStatus checkLaserOSStatus()
+        {
+            LaserOSStatus retStats = new LaserOSStatus() { LaserOn = false, AutoRandomMode = false, SimulatorOn = false };
+
+            if(laserOSWindow != IntPtr.Zero)
+            {
+                Color c;
+                var bmp = new Bitmap(561, 310, PixelFormat.Format32bppArgb);
+                Graphics graphics = Graphics.FromImage(bmp);
+/*
+                IntPtr oldWindow = GetForegroundWindow();
+                while (GetForegroundWindow() != laserOSWindow)
+                    SetForegroundWindow(laserOSWindow);
+*/
+                RECT rct = new RECT();
+                GetWindowRect(laserOSWindow, ref rct);
+
+                graphics.CopyFromScreen(rct.Left, rct.Top, 0, 0, new Size((rct.Right - rct.Left), (rct.Bottom - rct.Top)), CopyPixelOperation.SourceCopy);
+
+                c = bmp.GetPixel(68, 73);
+                if (c.R == 151 && c.G == 255 && c.B == 15) // ARGB=(255, 248, 108, 134) == Laser off || ARGB=(255, 151, 255, 15) == Laser on
+                    retStats.LaserOn = true;
+
+                c = bmp.GetPixel(433, 78);
+                if (c.R == 29 && c.G == 78 && c.B == 97) // ARGB=(255, 34, 59, 74) == Simulator off || ARGB=(255, 29, 78, 97) == Simulator on
+                    retStats.SimulatorOn = true;
+
+                c = bmp.GetPixel(215, 245);
+                if (c.R == 153 && c.G == 159 && c.B == 171) // ARGB=(255, 153, 159, 171) == Random on || ARGB=(255, 51, 63, 88) || ARGB=(255, 92, 101, 121) == Random off
+                    retStats.AutoRandomMode = true;
+/*
+                while (GetForegroundWindow() != oldWindow)
+                    SetForegroundWindow(oldWindow);
+ */
+            }
+            return retStats;
         }
 
         private void programTimer_Tick(object sender, EventArgs e)
@@ -591,6 +696,16 @@ namespace Lasergnome
             if (laserOSWindow != IntPtr.Zero) isConnectedToLaserOS.Checked = true;
             else isConnectedToLaserOS.Checked = false;
             #endregion
+
+            #region Get LaserOS status.
+            if (laserOSWindow != IntPtr.Zero) 
+            {
+                LaserOSStatus stat = checkLaserOSStatus();
+                laserOn.Checked = stat.LaserOn;
+                simulatorActive.Checked = stat.SimulatorOn;
+                runningAutoRandom.Checked = stat.AutoRandomMode;
+            }
+            #endregion
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -623,5 +738,11 @@ namespace Lasergnome
         {
             arduinome.setIntensity((byte)trackBar1.Value);
         }
+    }
+
+    class LaserOSStatus {
+        public bool LaserOn { get; set; }
+        public bool SimulatorOn { get; set; }
+        public bool AutoRandomMode { get; set; }
     }
 }
